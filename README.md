@@ -1,2 +1,2 @@
-# kc_quant_trading-
-the quant trading experimental platform
+# Algo Trading 
+The repo aims to provide multiple strategies in trading. 
