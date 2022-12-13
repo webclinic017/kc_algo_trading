@@ -7,6 +7,17 @@ import datetime
 # Code src: https://community.backtrader.com/topic/1512/kalman-pair-trade-with-ewa-ewc-from-ernie-chan-s-algorithmic-trading
 # reading ref : https://medium.com/analytics-vidhya/understanding-and-implementing-kalman-filter-in-python-for-pairs-trading-9b8986d79b2d
 class KalmanPair(bt.Strategy):
+    """In pairs trading, we should look for a “stationary” correlation 
+    between two assets and trade when the prices move away from the mean correlation.
+    If we take Ernest Chan’s pairs trading example using the ETF’s EWA and EWC, 
+    from 2006 to 2012, we can see that, the prices are correlated (Figure 3a) 
+    and performing a linear regression between EWC and EWA, 
+    we find slope=0.9624 and intercept=6.4113 
+
+
+    Args:
+        bt (_type_): _description_
+    """
     params = (("printlog", False), ("quantity", 1000))
 
     def log(self, txt, dt=None, doprint=False):
