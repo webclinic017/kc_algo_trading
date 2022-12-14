@@ -2,24 +2,25 @@
 import backtrader as bt
 import argparse
 import sys
+import pandas as pd
+
 sys.path.append('./')
-from model_hub.simple_ma import TheStrategy, MAcrossover, SmaCross, RSIStrategy
+from model_hub import simple_ma
 from data_pipe.stock_feeder import get_stock_data
 from analyzer_hub.cash_market import CashMarket
-# from observer_hub.simple import MyObserver, MyObserver2
+from utils import RegisterModel
 
-import pandas as pd
 
 
 
 def parse_args(pargs=None):
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description=(
-            'Multiple Values and Brackets'
+        description=('Multiple Values and Brackets')
         )
-    )
 
+    parser.add_argument('--model', required=False, default='EnhanceRSI', 
+                       help='run show_register_model.py')
 
     parser.add_argument('--plot', required=False, default='',
                         nargs='?', const='{}',
@@ -36,7 +37,9 @@ def main():
     # Create an instance of the strategy
     # Add the strategy and data to the engine
     # need to pash the class. .. 
-    cerebro.addstrategy(RSIStrategy)
+
+    cerebro.addstrategy(RegisterModel(args.model))
+
 
 
     stock_list = [
@@ -47,7 +50,9 @@ def main():
     ]
     for stock_name in stock_list:
         data = get_stock_data(stock_name=stock_name)
-        cerebro.adddata(data)
+        # when adding the data, need to specify name
+        cerebro.adddata(data, name=stock_name)
+
 
     # you can add analyzers and it will be capture in result 
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name = 'SR', 
@@ -86,8 +91,8 @@ def main():
     print('Max DrawDown:', result[0].analyzers.DW.get_analysis().max)
 
     # monthly gain 
-    for date, value in  result[0].analyzers.TR.get_analysis().items():
-        print(date.date(), f'monthly gain:{round(cash*value, 2)}$', f' {round(value*100, 4)}%:')  
+    # for date, value in  result[0].analyzers.TR.get_analysis().items():
+    #     print(date.date(), f'monthly gain:{round(cash*value, 2)}$', f' {round(value*100, 4)}%:')  
 
     # # suggest by chatgpt
     if args.plot:

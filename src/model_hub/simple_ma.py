@@ -3,7 +3,7 @@ import backtrader.indicators as btind
 from datetime import datetime
 from collections import defaultdict
 from utils import RegisterModel
-
+import numpy as np 
 
 # Create the strategy
 class TheStrategy(bt.Strategy):
@@ -107,24 +107,33 @@ class MAcrossover(bt.Strategy):
             print("Sale shares at prices {}".format(self.data.close[0]))
             print(self.position)
 
+
 @RegisterModel.on
 class EnhanceRSI(bt.Strategy):
 
+    # specify the param for optimizer
     params = dict(
         pfast=7,  # period for the fast moving average
-        pslow=20   # period for the slow moving average
+        pslow=20,  # period for the slow moving average
+        rsi_period=5, 
     )
 
     def __init__(self):
         # Create an RSI indicator
         # make multiple indicator for multiple asset  
         self.inds = defaultdict(dict)
+
+        # Need to apply the inde to all the 
         for d in self.datas:
+            self.inds[d]['f_sma'] = bt.talib.SMA(self.data, timeperiod=self.p.pfast)
             self.inds[d]['rsi'] = bt.indicators.RSI()
-            self.inds[d]['f_sma'] = bt.ind.SMA(period=self.p.pfast)  # fast moving average
+            #self.inds[d]['f_sma'] = bt.ind.SMA(period=self.p.pfast)  # fast moving average
             self.inds[d]['w_sma'] = bt.ind.SMA(period=self.p.pslow)  # fast moving average
             self.inds[d]['crossover'] = bt.ind.CrossOver(
                 self.inds[d]['f_sma'], self.inds[d]['w_sma']) 
+
+        # the model is actually sit in Indicator 
+        # even if you have suctomized data -> you will need indicator to also support it
 
 
     def notify_order(self, order):
@@ -149,6 +158,11 @@ class EnhanceRSI(bt.Strategy):
 
     def next(self):
         
+        # it seems 
+        # for i, d in enumerate(d for d in self.datas if len(d)):
+        #     if not self.order[d._name]:
+        #         continue
+
         current_po_size = self.position.size
         current_cash = self.broker.cash 
        # for every stock in my data

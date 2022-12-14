@@ -43,7 +43,8 @@ def main():
 
     stock_name = args.stock
     data = get_stock_data(stock_name=stock_name)
-    cerebro.adddata(data)
+    # add name so we can hook in Strategy
+    cerebro.adddata(data, name=stock_name)
 
     # you can add analyzers and it will be capture in result 
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name = 'SR', 
