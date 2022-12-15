@@ -1,15 +1,14 @@
 
-import backtrader as bt
 import argparse
 import sys
 sys.path.append('./')
 # regist model to RegisterModel
+import backtrader as bt
 from model_hub import simple_ma
-from data_pipe.stock_feeder import get_stock_data
+from data_pipe.stock_feeder import get_stock_data, get_stock_data_td
 from analyzer_hub.cash_market import CashMarket
 from utils import RegisterModel
 # from observer_hub.simple import MyObserver, MyObserver2
-
 import pandas as pd
 
 def parse_args(pargs=None):
@@ -22,7 +21,7 @@ def parse_args(pargs=None):
     parser.add_argument('--stock', required=False, default='RIOT',
                         metavar='kwargs', help='kwargs in key=value format')
 
-    parser.add_argument('--model', required=False, default='EnhanceRsi', 
+    parser.add_argument('--model', required=False, default='RSIStrategy', 
                        help='run show_register_model.py')
 
     parser.add_argument('--plot', required=False, default='',
@@ -39,10 +38,25 @@ def main():
     # Create an instance of the strategy
     # Add the strategy and data to the engine
     # need to pash the class. .. 
+    
+    # 
     cerebro.addstrategy(RegisterModel(args.model))
 
+
+    # from collections.abc, by using py3.10, which is 3.9 above
+    # you will hit the problem of AttributeError: module 'collections' has no attribute 'Iterable'
+    # which is similar to this problem: https://github.com/nerdocs/pydifact/issues/46
+    # from collections.abc
+    # == code
+    # strats = cerebro.optstrategy(
+    #         RegisterModel(args.model),
+    #         pfast = range(1, 11), 
+    #         pslow = range(20, 50, 5))
+ 
+
+ 
     stock_name = args.stock
-    data = get_stock_data(stock_name=stock_name)
+    data = get_stock_data_td(symbol=stock_name)
     # add name so we can hook in Strategy
     cerebro.adddata(data, name=stock_name)
 
@@ -53,6 +67,8 @@ def main():
     cerebro.addanalyzer(bt.analyzers.DrawDown, _name = 'DW')
     cerebro.addanalyzer(bt.analyzers.TimeReturn, _name = 'TR', 
                         timeframe=bt.TimeFrame.Months)
+                        
+    cerebro.addanalyzer(bt.analyzers.Returns, _name = "returns")
 
     cerebro.addanalyzer(CashMarket, _name = "cash_market")
 
@@ -62,7 +78,9 @@ def main():
     cerebro.broker.setcash(cash)
 
     # add size to all strategy 
-    cerebro.addsizer(bt.sizers.SizerFix, stake=20)  # default sizer for strategies
+    cerebro.addsizer(bt.sizers.SizerFix, stake=30)
+
+    #cerebro.addsizer(bt.sizers.PercentSizer, percents = 10)
 
     # the sizer can be specified with particular strategy
     # ---

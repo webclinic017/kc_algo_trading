@@ -121,7 +121,8 @@ class PriceHistory():
 
             valid_chart_values = {
                 'minute': {
-                    'day': [1, 2, 3, 4, 5, 10]
+                    'day': [1, 2, 3, 4, 5, 10],
+
                 },
                 'daily': {
                     'month': [1, 2, 3, 6],

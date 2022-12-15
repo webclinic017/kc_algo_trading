@@ -31,11 +31,11 @@ class TheStrategy(bt.Strategy):
 
 # Notice the trading strategy should decouple with order/observer and analyzer
 @RegisterModel.on
-class MAcrossover(bt.Strategy): 
+class MaCrossover(bt.Strategy): 
     # Moving average parameters
-    params = dict(
-        pfast=7,  # period for the fast moving average
-        pslow=20   # period for the slow moving average
+    params = (
+        ("pfast", 7),  # period for the fast moving average
+        ("pslow",20)   # period for the slow moving average
     )
 
     def __init__(self):
@@ -87,7 +87,7 @@ class MAcrossover(bt.Strategy):
 
         if self.position:
             position_price = self.position.price
-            dt = self.datas[0].datetime.date(0)
+            dt = self.datas[0].datetime
 
             print(dt, ' position price:',position_price)
 
@@ -109,7 +109,7 @@ class MAcrossover(bt.Strategy):
 
 
 @RegisterModel.on
-class EnhanceRSI(bt.Strategy):
+class EnhanceRsi(bt.Strategy):
 
     # specify the param for optimizer
     params = dict(
@@ -146,14 +146,14 @@ class EnhanceRSI(bt.Strategy):
                 op_name = 'BUY'
             elif order.issell():
                 op_name = 'SELL'
-            print(f"""{dt}: {op_name} , {order.data._name}
-                    價格: {round(order.executed.price, 2)} 
-                    成本: {round(order.executed.value, 2)} 
-                    手續費: {round(order.executed.comm, 2)}
-                    Cash: {round(self.broker.cash, 2)}
-                    Asset Value: {round(self.broker.getvalue(), 2)}
-                    {self.position}
-                   """)
+            # print(f"""{dt}: {op_name} , {order.data._name}
+            #         價格: {round(order.executed.price, 2)} 
+            #         成本: {round(order.executed.value, 2)} 
+            #         手續費: {round(order.executed.comm, 2)}
+            #         Cash: {round(self.broker.cash, 2)}
+            #         Asset Value: {round(self.broker.getvalue(), 2)}
+            #         {self.position}
+            #        """)
             self.bar_executed = len(self)
 
     def next(self):
@@ -193,7 +193,7 @@ class EnhanceRSI(bt.Strategy):
 
 # Create a new strategy
 @RegisterModel.on
-class RSIStrategy(bt.Strategy):
+class RsiStrategy(bt.Strategy):
     def __init__(self):
         # Create an RSI indicator
         
@@ -223,7 +223,7 @@ class RSIStrategy(bt.Strategy):
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
             return
-        dt = self.datas[0].datetime.date(0)
+        dt = self.datas[0].datetime.now()
 
         if order.status in [order.Completed]:
             if order.isbuy():
