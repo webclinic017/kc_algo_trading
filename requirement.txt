@@ -1,3 +1,6 @@
 git+https://github.com/mementum/backtrader.git@0fa63ef4a35dc53cc7320813f8b15480c8f85517#egg=backtrader
 yfinance
 matplotlib
+requests>=2.24.0
+dataclasses>=0.6
+websockets>=9.1
